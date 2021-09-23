@@ -3,6 +3,8 @@ import redis from '../../src/util/redis';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
 
+    
+
     if(!req.query["link"]) return res.status(500).json({error: true})
     let shortened = req.query["link"];
 
