@@ -7,7 +7,6 @@ import styled from 'styled-components';
 const Home: NextPage = () => {
 
     const [cmdHistory, setCmdHistory]: any[] = useState([]);
-    const [command, setCommand] = useState("");
 
     useEffect(() => {
         document.addEventListener('keypress', checkKey);
@@ -20,18 +19,16 @@ const Home: NextPage = () => {
         }
     }
 
-    const handleCommand = () => {
+    const handleCommand = async () => {
 
-        console.log('Command handling...');
+        const command = (document.getElementById(`currentCommand`) as HTMLInputElement).value;
 
-        (document.getElementById(`currentCommand`) as HTMLInputElement).value = "";
-
-        setCmdHistory([...cmdHistory, {
+        await setCmdHistory([...cmdHistory, {
             first: document.getElementById(`currentFirst`)!.innerText, 
             input: command
         }]);
 
-        console.log(cmdHistory);
+        return (document.getElementById(`currentCommand`) as HTMLInputElement).value = "";
     }
 
     return (
@@ -39,15 +36,15 @@ const Home: NextPage = () => {
             {cmdHistory.map((element: any, index: number) => {
                 return (
                     <CommandLine key={`command${index}`}> 
-                        <First id={`first${index}`}>{element.first}</First>
-                        <PrevInput id={`input${index}`}>{element.input}</PrevInput>
+                        <First id={`first${index}`}>{cmdHistory[index].first}</First>
+                        <PrevInput id={`input${index}`}>{cmdHistory[index].input}</PrevInput>
                     </CommandLine>
                 )
             })}
 
             <CommandLine> 
                 <First id='currentFirst'>{'cnrad/projects/l.cnrad.dev>'}</First>
-                <Input id='currentCommand' onChange={e => {setCommand(e.target.value); console.log(`changed value to ${command}`);}} />
+                <Input id='currentCommand' />
             </CommandLine>
         </Page>
     )
@@ -61,6 +58,8 @@ const Page = styled.div`
     width: 100%;
     height: 100vh;
     padding: 1rem;
+
+    overflow-y: scroll;
 `
 
 const CommandLine = styled.div`
