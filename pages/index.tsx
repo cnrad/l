@@ -23,8 +23,6 @@ const Home: NextPage = () => {
     const handleCommand = async () => {
         const command = (document.getElementById(`currentCommand`) as HTMLInputElement).value;
 
-        executeCommand(command);
-
         await setCmdHistory([
             ...cmdHistory,
             {
@@ -33,18 +31,16 @@ const Home: NextPage = () => {
             },
         ]);
 
+        executeCommand(command);
+
         return ((document.getElementById(`currentCommand`) as HTMLInputElement).value = "");
     };
 
     const executeCommand = async (cmd: string) => {
         let cmdArgs = cmd.split(" ");
 
-        if (cmdArgs[0] === "create") {
-            let result = await createLink(cmdArgs[1])
-            .then(res => res.json());
-            
-            console.log(result.code);
-        }
+        if (cmdArgs[0] === "create") await createLink(cmdArgs[1])
+
     };
 
     async function createLink(link: string) {
@@ -55,9 +51,17 @@ const Home: NextPage = () => {
             headers: {
                 "Content-Type": "application/json",
             },
-        });
+        }).then(res => res.json());
 
-        return data;
+        navigator.clipboard.writeText(`https://l.cnrad.dev/${data.code}`);
+
+        await setCmdHistory([
+            ...cmdHistory,
+            {
+                first: `Copied Link --> https://l.cnrad.dev/${data.code}`,
+                input: "",
+            },
+        ]);
     }
 
     return (
