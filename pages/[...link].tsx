@@ -6,7 +6,7 @@ export async function getServerSideProps(context: any) {
 
     let response = await redis.hget("links", shortened);
 
-    fetch(`/api/log?link=${shortened}`)
+    console.log(response);
 
     if (!response) {
         return {
@@ -45,7 +45,7 @@ const Main = styled.div`
 
 const Message = styled.div`
     font-size: 20px;
-    font-family: "Inter", sans-serif;
+    font-family: 'Ubuntu Mono', sans-serif;
     font-weight: 600;
-    color: #fff;
+    color: #3f3;
 `;

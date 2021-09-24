@@ -1,3 +1,5 @@
+import redis from '../util/redis';
+
 export default function random(Length: number) {
     let final: string = "";
     const randomChar = () => {
