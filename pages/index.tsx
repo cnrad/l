@@ -6,49 +6,48 @@ import styled from 'styled-components';
 
 const Home: NextPage = () => {
 
-    let [cmdHistory, setCmdHistory]: any[] = useState([]);
-    let [command, setCommand] = useState("");
+    const [cmdHistory, setCmdHistory]: any[] = useState([]);
+    const [command, setCommand] = useState("");
 
     useEffect(() => {
-        window.addEventListener('keypress', checkKey);
+        document.addEventListener('keypress', checkKey);
     }, [cmdHistory])
 
     const checkKey = (event: any): any => {
         if (event.key === 'Enter') {
-            window.removeEventListener('keypress', checkKey);
+            document.removeEventListener('keypress', checkKey);
             handleCommand();
-            window.addEventListener('keypress', checkKey);
         }
     }
 
     const handleCommand = () => {
 
-        console.log(command);
+        console.log('Command handling...');
 
-        let firstText = document.getElementById(`currentFirst`)!.innerText;
-        let commandText = command;
         (document.getElementById(`currentCommand`) as HTMLInputElement).value = "";
 
-        setCmdHistory([...cmdHistory, {first: firstText, input: commandText}])
+        setCmdHistory([...cmdHistory, {
+            first: document.getElementById(`currentFirst`)!.innerText, 
+            input: command
+        }]);
 
-        return console.log(cmdHistory);
-
+        console.log(cmdHistory);
     }
 
     return (
         <Page>
-            {cmdHistory.length > 0 ? cmdHistory.map((element: any, index: number) => {
+            {cmdHistory.map((element: any, index: number) => {
                 return (
                     <CommandLine key={`command${index}`}> 
                         <First id={`first${index}`}>{element.first}</First>
                         <PrevInput id={`input${index}`}>{element.input}</PrevInput>
                     </CommandLine>
                 )
-            }) : ''}
+            })}
 
             <CommandLine> 
                 <First id='currentFirst'>{'cnrad/projects/l.cnrad.dev>'}</First>
-                <Input id='currentCommand' onChange={e => setCommand(e.target.value)} />
+                <Input id='currentCommand' onChange={e => {setCommand(e.target.value); console.log(`changed value to ${command}`);}} />
             </CommandLine>
         </Page>
     )
