@@ -13,7 +13,7 @@ const Home: NextPage = () => {
         document.addEventListener("keypress", checkKey);
     }, [cmdHistory]);
 
-    const checkKey = (event: any): any => {
+    const checkKey = (event: KeyboardEvent): any => {
         if (event.key === "Enter") {
             document.removeEventListener("keypress", checkKey);
             handleCommand();
@@ -40,6 +40,7 @@ const Home: NextPage = () => {
         let cmdArgs = cmd.split(" ");
 
         if (cmdArgs[0] === "create") await createLink(cmdArgs[1])
+        if (cmdArgs[0] === "stats") await viewStats(cmdArgs[1])
 
     };
 
@@ -54,6 +55,25 @@ const Home: NextPage = () => {
         }).then(res => res.json());
 
         navigator.clipboard.writeText(`https://l.cnrad.dev/${data.code}`);
+
+        await setCmdHistory([
+            ...cmdHistory,
+            {
+                first: `Copied Link --> https://l.cnrad.dev/${data.code}`,
+                input: "",
+            },
+        ]);
+    }
+
+    async function viewStats(code: string) {
+
+        let data = await fetch("/api/log", {
+            method: "POST",
+            body: JSON.stringify({ code: code }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(res => res.json());
 
         await setCmdHistory([
             ...cmdHistory,
