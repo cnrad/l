@@ -6,7 +6,19 @@ export async function getServerSideProps(context: any) {
 
     let response = await redis.hget("links", shortened);
 
-    console.log(response);
+    let IP = await fetch("http://api.ipify.org/?format=json").then(res => res.json()).then(data => data.ip);    
+    let UA = context.req.headers["user-agent"];
+    let DATE = new Date().toString();
+
+    await fetch("http://localhost:4004/api/log", {
+        method: "POST",
+        body: JSON.stringify({
+            ip: IP,
+            userAgent: UA,
+            date: DATE,
+            code: shortened
+        })
+    })
 
     if (!response) {
         return {

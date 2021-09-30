@@ -67,7 +67,7 @@ const Home: NextPage = () => {
 
     async function viewStats(code: string) {
 
-        let data = await fetch("/api/log", {
+        let data = await fetch("/api/stats", {
             method: "POST",
             body: JSON.stringify({ code: code }),
             headers: {
@@ -75,10 +75,12 @@ const Home: NextPage = () => {
             },
         }).then(res => res.json());
 
+        console.log(data)
+
         await setCmdHistory([
             ...cmdHistory,
             {
-                first: `Copied Link --> https://l.cnrad.dev/${data.code}`,
+                first: JSON.stringify(data),
                 input: "",
             },
         ]);

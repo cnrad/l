@@ -1,22 +1,28 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import redis from '../../src/util/redis';
 
+interface DataProps {
+    ip: string,
+    userAgent: string,
+    date: string,
+    code: string
+}
+
 export default async (req: NextApiRequest, res: NextApiResponse) => {
 
-    
+    let data: DataProps = JSON.parse(req.body);
 
-    if(!req.query["link"]) return res.status(500).json({error: true})
-    let shortened = req.query["link"];
+    console.log(data)
 
-    let userIp = await fetch("http://api.ipify.org/?format=json");
+    let shortened = data.code;
 
     let object = JSON.stringify({
-        "user-agent": "test",
-        "ip": userIp,
-        "date": new Date().toString()
+        userAgent: data.userAgent,
+        ip: data.ip,
+        date: data.date
     })
 
-    await redis.hset("data", shortened, object);
+    await redis.hset("stats", shortened, object);
 
     return res.status(200);
 }
