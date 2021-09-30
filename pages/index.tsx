@@ -89,6 +89,13 @@ const Home: NextPage = () => {
     return (
         <Page>
             {cmdHistory.map((element: any, index: number) => {
+
+                if(cmdHistory[index].first.includes("userAgent")) return (
+                    <DataCont>
+                        {cmdHistory[index].first}
+                    </DataCont>
+                )
+
                 return (
                     <CommandLine key={`command${index}`}>
                         <First id={`first${index}`}>{cmdHistory[index].first}</First>
@@ -175,5 +182,18 @@ const PrevInput = styled.div`
     height: 2rem;
     margin-left: 1rem;
 `;
+
+const DataCont = styled.div`
+    background: #000;
+    color: inherit;
+    outline: none;
+    border: none;
+    letter-spacing: 0.02rem;
+    font-family: "Ubuntu Mono";
+    font-size: 1rem;
+
+    width: auto;
+    height: 5rem;
+`
 
 export default Home;

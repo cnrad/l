@@ -4,6 +4,7 @@ import random from "../../src/util/random";
 
 type Data = {
     code?: string,
+    stats?: string,
     error?: string
 }
 
@@ -16,7 +17,9 @@ export default async function handler(
 
     let stats: string = await redis.hget("stats", shortened) as string;
 
+    console.log(stats)
+    
     stats = await JSON.parse(stats);
 
-    return res.status(200).json({ code: stats });
+    return res.status(200).json({ code: shortened, stats: stats });
 }

@@ -10,6 +10,8 @@ export async function getServerSideProps(context: any) {
     let UA = context.req.headers["user-agent"];
     let DATE = new Date().toString();
 
+    console.log("data fetched")
+
     await fetch("http://localhost:4004/api/log", {
         method: "POST",
         body: JSON.stringify({
@@ -19,6 +21,8 @@ export async function getServerSideProps(context: any) {
             code: shortened
         })
     })
+
+    console.log("posted data")
 
     if (!response) {
         return {
