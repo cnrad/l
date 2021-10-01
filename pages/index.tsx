@@ -4,14 +4,16 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
-import createLink from "../src/commands/create";
-
 const Home: NextPage = () => {
     const [cmdHistory, setCmdHistory]: any[] = useState([]);
 
     useEffect(() => {
         document.addEventListener("keypress", checkKey);
+        (document.getElementById(`currentCommand`) as HTMLInputElement).value = "";
+        console.log(cmdHistory)
     }, [cmdHistory]);
+
+
 
     const checkKey = (event: KeyboardEvent): any => {
         if (event.key === "Enter") {
@@ -23,7 +25,7 @@ const Home: NextPage = () => {
     const handleCommand = async () => {
         const command = (document.getElementById(`currentCommand`) as HTMLInputElement).value;
 
-        await setCmdHistory([
+        await setCmdHistory((cmdHistory: any) => [
             ...cmdHistory,
             {
                 first: document.getElementById(`currentFirst`)!.innerText,
@@ -31,9 +33,7 @@ const Home: NextPage = () => {
             },
         ]);
 
-        executeCommand(command);
-
-        return ((document.getElementById(`currentCommand`) as HTMLInputElement).value = "");
+        return executeCommand(command);
     };
 
     const executeCommand = async (cmd: string) => {
@@ -42,9 +42,24 @@ const Home: NextPage = () => {
         if (cmdArgs[0] === "create") await createLink(cmdArgs[1])
         if (cmdArgs[0] === "stats") await viewStats(cmdArgs[1])
 
+        return;
     };
 
     async function createLink(link: string) {
+
+        let password = window.prompt("Password");
+
+        let validPass = await fetch(`/api/checkPass?pass=${password}`).then(
+            res => res.json()
+        )
+
+        if(validPass.success == false) return await setCmdHistory((cmdHistory: any) => [
+            ...cmdHistory,
+            {
+                first: `Incorrect password!`,
+                input: "",
+            },
+        ]);
 
         let data = await fetch("/api/create", {
             method: "POST",
@@ -56,7 +71,7 @@ const Home: NextPage = () => {
 
         navigator.clipboard.writeText(`https://l.cnrad.dev/${data.code}`);
 
-        await setCmdHistory([
+        await setCmdHistory((cmdHistory: any) => [
             ...cmdHistory,
             {
                 first: `Copied Link --> https://l.cnrad.dev/${data.code}`,
@@ -77,7 +92,7 @@ const Home: NextPage = () => {
 
         console.log(data)
 
-        await setCmdHistory([
+        await setCmdHistory((cmdHistory: any) => [
             ...cmdHistory,
             {
                 first: JSON.stringify(data),
@@ -90,11 +105,17 @@ const Home: NextPage = () => {
         <Page>
             {cmdHistory.map((element: any, index: number) => {
 
-                if(cmdHistory[index].first.includes("userAgent")) return (
-                    <DataCont>
-                        {cmdHistory[index].first}
-                    </DataCont>
-                )
+                if(cmdHistory[index].first.includes("userAgent")) {
+                    let obj = JSON.parse(cmdHistory[index].first)
+
+                    return (
+                        <DataCont>
+                            {`${obj.code}`}
+                            <br/>{'---------------'}<br/><br/>
+                            {`${JSON.stringify(obj.stats)}`}
+                        </DataCont>
+                    )
+                }
 
                 return (
                     <CommandLine key={`command${index}`}>
@@ -106,7 +127,7 @@ const Home: NextPage = () => {
 
             <CommandLine>
                 <First id="currentFirst">{"cnrad/projects/l.cnrad.dev>"}</First>
-                <Input id="currentCommand" />
+                <Input id="currentCommand" defaultValue=""/>
             </CommandLine>
         </Page>
     );
@@ -193,7 +214,7 @@ const DataCont = styled.div`
     font-size: 1rem;
 
     width: auto;
-    height: 5rem;
+    height: auto;
 `
 
 export default Home;
