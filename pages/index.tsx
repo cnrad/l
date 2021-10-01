@@ -80,6 +80,17 @@ const Home: NextPage = () => {
 
     async function viewStats(code: string) {
 
+        let password = window.prompt("Password");
+
+        let validPass = await fetch(`/api/checkPass?pass=${password}`).then(
+            res => res.json()
+        )
+
+        if(validPass.success == false) return {
+            first: `Incorrect password!`,
+            input: "",
+        };
+
         let data = await fetch("/api/stats", {
             method: "POST",
             body: JSON.stringify({ code: code }),
@@ -87,6 +98,13 @@ const Home: NextPage = () => {
                 "Content-Type": "application/json",
             },
         }).then(res => res.json());
+
+        console.log(data)
+
+        if(data.stats === null) return {
+            first: "Invalid code, or nobody has used the link yet!",
+            input: "",
+        };
 
         return {
             first: JSON.stringify(data),
