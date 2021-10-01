@@ -6,7 +6,7 @@ export async function getServerSideProps(context: any) {
 
     let response = await redis.hget("links", shortened);
 
-    let IP = await fetch("http://api.ipify.org/?format=json").then(res => res.json()).then(data => data.ip);    
+    let IP = await fetch("http://l.cnrad.dev/api/getIP").then(res => res.json()).then(data => data.ip);    
     let UA = context.req.headers["user-agent"];
     let DATE = new Date().toString();
 
@@ -24,9 +24,12 @@ export async function getServerSideProps(context: any) {
 
     console.log("posted data")
 
-    if (!response) {
+    if (!response || response == null) {
         return {
-            notFound: true,
+            redirect: {
+                destination: "https://l.cnrad.dev",
+                permanent: true,
+            },
         };
     }
 

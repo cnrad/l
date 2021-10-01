@@ -117,34 +117,39 @@ const Home: NextPage = () => {
     }
 
     return (
-        <Page>
-            {cmdHistory.map((element: any, index: number) => {
+        <>
+            <Head>
+                <title>{'cnrad/projects/l>'}</title>
+            </Head>
+            <Page>
+                {cmdHistory.map((element: any, index: number) => {
 
-                if(cmdHistory[index].first.includes("userAgent")) {
-                    let obj = JSON.parse(cmdHistory[index].first)
+                    if(cmdHistory[index].first.includes("userAgent")) {
+                        let obj = JSON.parse(cmdHistory[index].first)
+
+                        return (
+                            <DataCont>
+                                {`${obj.code}`}
+                                <br/>{'---------------'}<br/><br/>
+                                {`${JSON.stringify(obj.stats)}`}
+                            </DataCont>
+                        )
+                    }
 
                     return (
-                        <DataCont>
-                            {`${obj.code}`}
-                            <br/>{'---------------'}<br/><br/>
-                            {`${JSON.stringify(obj.stats)}`}
-                        </DataCont>
-                    )
-                }
+                        <CommandLine key={`command${index}`}>
+                            <First id={`first${index}`}>{cmdHistory[index].first}</First>
+                            <PrevInput id={`input${index}`}>{cmdHistory[index].input}</PrevInput>
+                        </CommandLine>
+                    );
+                })}
 
-                return (
-                    <CommandLine key={`command${index}`}>
-                        <First id={`first${index}`}>{cmdHistory[index].first}</First>
-                        <PrevInput id={`input${index}`}>{cmdHistory[index].input}</PrevInput>
-                    </CommandLine>
-                );
-            })}
-
-            <CommandLine>
-                <First id="currentFirst">{"cnrad/projects/l.cnrad.dev>"}</First>
-                <Input id="currentCommand" defaultValue=""/>
-            </CommandLine>
-        </Page>
+                <CommandLine>
+                    <First id="currentFirst">{"cnrad/projects/l.cnrad.dev>"}</First>
+                    <Input id="currentCommand" defaultValue=""/>
+                </CommandLine>
+            </Page>
+        </>
     );
 };
 
