@@ -13,8 +13,6 @@ const Home: NextPage = () => {
         console.log(cmdHistory)
     }, [cmdHistory]);
 
-
-
     const checkKey = (event: KeyboardEvent): any => {
         if (event.key === "Enter") {
             document.removeEventListener("keypress", checkKey);
@@ -25,24 +23,30 @@ const Home: NextPage = () => {
     const handleCommand = async () => {
         const command = (document.getElementById(`currentCommand`) as HTMLInputElement).value;
 
+        let result: any = await executeCommand(command);
+
+        console.log(result);
+
         await setCmdHistory((cmdHistory: any) => [
             ...cmdHistory,
             {
                 first: document.getElementById(`currentFirst`)!.innerText,
                 input: command,
             },
+            {
+                first: result.first,
+                input: result.input,
+            },
         ]);
-
-        return executeCommand(command);
     };
 
     const executeCommand = async (cmd: string) => {
         let cmdArgs = cmd.split(" ");
 
-        if (cmdArgs[0] === "create") await createLink(cmdArgs[1])
-        if (cmdArgs[0] === "stats") await viewStats(cmdArgs[1])
+        if (cmdArgs[0] === "create") return createLink(cmdArgs[1]);
+        if (cmdArgs[0] === "stats") return viewStats(cmdArgs[1]);
 
-        return;
+        return invalidCommand(cmdArgs[0]);
     };
 
     async function createLink(link: string) {
@@ -53,13 +57,10 @@ const Home: NextPage = () => {
             res => res.json()
         )
 
-        if(validPass.success == false) return await setCmdHistory((cmdHistory: any) => [
-            ...cmdHistory,
-            {
-                first: `Incorrect password!`,
-                input: "",
-            },
-        ]);
+        if(validPass.success == false) return {
+            first: `Incorrect password!`,
+            input: "",
+        };
 
         let data = await fetch("/api/create", {
             method: "POST",
@@ -71,13 +72,10 @@ const Home: NextPage = () => {
 
         navigator.clipboard.writeText(`https://l.cnrad.dev/${data.code}`);
 
-        await setCmdHistory((cmdHistory: any) => [
-            ...cmdHistory,
-            {
-                first: `Copied Link --> https://l.cnrad.dev/${data.code}`,
-                input: "",
-            },
-        ]);
+        return {
+            first: `Copied Link --> https://l.cnrad.dev/${data.code}`,
+            input: "",
+        };
     }
 
     async function viewStats(code: string) {
@@ -90,15 +88,17 @@ const Home: NextPage = () => {
             },
         }).then(res => res.json());
 
-        console.log(data)
+        return {
+            first: JSON.stringify(data),
+            input: "",
+        };
+    }
 
-        await setCmdHistory((cmdHistory: any) => [
-            ...cmdHistory,
-            {
-                first: JSON.stringify(data),
-                input: "",
-            },
-        ]);
+    async function invalidCommand(command: string){
+        return {
+            first: `"${command}" is not a valid command!`,
+            input: "",
+        };
     }
 
     return (
