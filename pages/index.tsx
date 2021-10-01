@@ -10,7 +10,6 @@ const Home: NextPage = () => {
     useEffect(() => {
         document.addEventListener("keypress", checkKey);
         (document.getElementById(`currentCommand`) as HTMLInputElement).value = "";
-        console.log(cmdHistory)
     }, [cmdHistory]);
 
     const checkKey = (event: KeyboardEvent): any => {
@@ -98,8 +97,6 @@ const Home: NextPage = () => {
                 "Content-Type": "application/json",
             },
         }).then(res => res.json());
-
-        console.log(data)
 
         if(data.stats === null) return {
             first: "Invalid code, or nobody has used the link yet!",
