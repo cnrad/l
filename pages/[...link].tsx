@@ -12,7 +12,7 @@ export async function getServerSideProps(context: any) {
 
     console.log("data fetched")
 
-    await fetch("http://localhost:4004/api/log", {
+    await fetch("http://l.cnrad.dev/api/log", {
         method: "POST",
         body: JSON.stringify({
             ip: IP,
