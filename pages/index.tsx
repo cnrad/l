@@ -129,9 +129,17 @@ const Home: NextPage = () => {
 
                         return (
                             <DataCont>
-                                {`${obj.code}`}
-                                <br/>{'---------------'}<br/><br/>
-                                {`${JSON.stringify(obj.stats)}`}
+                                {obj.stats.map((element: any, index: number) => {
+                                    return (
+                                        <>
+                                            <br/>
+                                            <DataLine>{`${index} || Visited on || . . . ${element["date"]}`}</DataLine>
+                                            <DataLine>{`${index} || User Agent || . . . ${element["userAgent"]}`}</DataLine>
+                                            <DataLine>{`${index} || IP Address || . . . ${element["ip"]}`}</DataLine>
+                                        </>
+                                    )
+                                })}
+
                             </DataCont>
                         )
                     }
@@ -225,6 +233,7 @@ const PrevInput = styled.div`
 `;
 
 const DataCont = styled.div`
+    margin: 1rem 0;
     background: #000;
     color: inherit;
     outline: none;
@@ -235,6 +244,14 @@ const DataCont = styled.div`
 
     width: auto;
     height: auto;
+`
+
+const DataLine = styled.div`
+    width: auto;
+    height: auto;
+    line-height: 1.25rem;
+
+
 `
 
 export default Home;
