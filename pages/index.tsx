@@ -49,17 +49,15 @@ const Home: NextPage = () => {
     };
 
     async function createLink(link: string) {
-
         let password = window.prompt("Password");
 
-        let validPass = await fetch(`/api/checkPass?pass=${password}`).then(
-            res => res.json()
-        )
+        let validPass = await fetch(`/api/checkPass?pass=${password}`).then(res => res.json());
 
-        if(validPass.success == false) return {
-            first: `Incorrect password!`,
-            input: "",
-        };
+        if (validPass.success == false)
+            return {
+                first: `Incorrect password!`,
+                input: "",
+            };
 
         let data = await fetch("/api/create", {
             method: "POST",
@@ -78,17 +76,15 @@ const Home: NextPage = () => {
     }
 
     async function viewStats(code: string) {
-
         let password = window.prompt("Password");
 
-        let validPass = await fetch(`/api/checkPass?pass=${password}`).then(
-            res => res.json()
-        )
+        let validPass = await fetch(`/api/checkPass?pass=${password}`).then(res => res.json());
 
-        if(validPass.success == false) return {
-            first: `Incorrect password!`,
-            input: "",
-        };
+        if (validPass.success == false)
+            return {
+                first: `Incorrect password!`,
+                input: "",
+            };
 
         let data = await fetch("/api/stats", {
             method: "POST",
@@ -98,10 +94,11 @@ const Home: NextPage = () => {
             },
         }).then(res => res.json());
 
-        if(data.stats === null) return {
-            first: "Invalid code, or nobody has used the link yet!",
-            input: "",
-        };
+        if (data.stats === null)
+            return {
+                first: "Invalid code, or nobody has used the link yet!",
+                input: "",
+            };
 
         return {
             first: JSON.stringify(data),
@@ -109,7 +106,7 @@ const Home: NextPage = () => {
         };
     }
 
-    async function invalidCommand(command: string){
+    async function invalidCommand(command: string) {
         return {
             first: `"${command}" is not a valid command!`,
             input: "",
@@ -119,29 +116,27 @@ const Home: NextPage = () => {
     return (
         <>
             <Head>
-                <title>{'cnrad/projects/l>'}</title>
+                <title>{"cnrad/projects/l>"}</title>
             </Head>
             <Page>
                 {cmdHistory.map((element: any, index: number) => {
-
-                    if(cmdHistory[index].first.includes("userAgent")) {
-                        let obj = JSON.parse(cmdHistory[index].first)
+                    if (cmdHistory[index].first.includes("userAgent")) {
+                        let obj = JSON.parse(cmdHistory[index].first);
 
                         return (
                             <DataCont>
                                 {obj.stats.map((element: any, index: number) => {
                                     return (
                                         <>
-                                            <br/>
                                             <DataLine>{`${index} || Visited on || . . . ${element["date"]}`}</DataLine>
                                             <DataLine>{`${index} || User Agent || . . . ${element["userAgent"]}`}</DataLine>
                                             <DataLine>{`${index} || IP Address || . . . ${element["ip"]}`}</DataLine>
+                                            <br />
                                         </>
-                                    )
+                                    );
                                 })}
-
                             </DataCont>
-                        )
+                        );
                     }
 
                     return (
@@ -154,7 +149,7 @@ const Home: NextPage = () => {
 
                 <CommandLine>
                     <First id="currentFirst">{"cnrad/projects/l.cnrad.dev>"}</First>
-                    <Input id="currentCommand" defaultValue=""/>
+                    <Input id="currentCommand" defaultValue="" />
                 </CommandLine>
             </Page>
         </>
@@ -233,7 +228,7 @@ const PrevInput = styled.div`
 `;
 
 const DataCont = styled.div`
-    margin: 1rem 0;
+    margin-top: 1rem;
     background: #000;
     color: inherit;
     outline: none;
@@ -244,14 +239,12 @@ const DataCont = styled.div`
 
     width: auto;
     height: auto;
-`
+`;
 
 const DataLine = styled.div`
     width: auto;
     height: auto;
     line-height: 1.25rem;
-
-
-`
+`;
 
 export default Home;
