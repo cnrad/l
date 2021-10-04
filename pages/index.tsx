@@ -1,6 +1,5 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
@@ -29,9 +28,7 @@ const Home: NextPage = () => {
                     return document.addEventListener("keypress", checkKey);
                 } else if (validPass.success === true) {
                     setPassword(pass);
-                    console.log(password, pass)
                     setAuth(true);
-                    console.log(auth)
                 }
 
             }
@@ -44,8 +41,6 @@ const Home: NextPage = () => {
         const command = (document.getElementById(`currentCommand`) as HTMLInputElement).value;
 
         let result: any = await executeCommand(command);
-
-        console.log(result);
 
         await setCmdHistory((cmdHistory: any) => [
             ...cmdHistory,
