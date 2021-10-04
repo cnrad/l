@@ -12,12 +12,16 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
 
-    let shortened = await random(5);
-    let newLink = new RegExp("^(http|https)://", "i").test(req.body.url)
-                ? req.body.url
-                : `https://${req.body.url}`;
+    if (req.body.auth == process.env.URL_PASSWORD) {
+        let shortened = await random(5);
+        let newLink = new RegExp("^(http|https)://", "i").test(req.body.url)
+                    ? req.body.url
+                    : `https://${req.body.url}`;
+    
+        await redis.hset("links", shortened, newLink);
+    
+        return res.status(200).json({ code: shortened });
+    } else return res.status(400).json({ error: "Invalid auth!" });
 
-    await redis.hset("links", shortened, newLink);
-
-    return res.status(200).json({ code: shortened });
+    
 }

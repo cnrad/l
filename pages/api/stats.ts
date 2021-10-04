@@ -13,13 +13,13 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
 
-    let shortened = req.body.code;
+    if (req.body.auth == process.env.URL_PASSWORD) {
 
-    let stats: string = await redis.hget("stats", shortened) as string;
+        let shortened = req.body.code;
 
-    console.log(stats)
+        let stats: string = await redis.hget("stats", shortened) as string;
+        stats = await JSON.parse(stats);
 
-    stats = await JSON.parse(stats);
-
-    return res.status(200).json({ code: shortened, stats: stats });
+        return res.status(200).json({ code: shortened, stats: stats });
+    } else return res.status(400).json({error: "Invalid auth!"});
 }

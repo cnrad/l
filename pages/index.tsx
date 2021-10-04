@@ -7,17 +7,19 @@ import styled from "styled-components";
 const Home: NextPage = () => {
     const [cmdHistory, setCmdHistory]: any[] = useState([]);
     const [auth, setAuth] = useState(false);
+    const [password, setPassword] = useState("");
 
     useEffect(() => {
         document.addEventListener("keypress", checkKey);
         if (auth == true) (document.getElementById(`currentCommand`) as HTMLInputElement).value = "";
-    }, [cmdHistory]);
+        
+    }, [cmdHistory, auth]);
 
     const checkKey = async (event: KeyboardEvent): Promise<any> => {
         if (event.key === "Enter") {
             document.removeEventListener("keypress", checkKey);
 
-            if (auth === false) {
+            if (auth == false) {
                 let pass = (document.getElementById(`password`) as HTMLInputElement).value;
 
                 let validPass = await fetch(`/api/checkPass?pass=${pass}`).then(res => res.json());
@@ -25,13 +27,16 @@ const Home: NextPage = () => {
                 if (validPass.success === false) {
                     (document.getElementById(`password`) as HTMLInputElement).value = "";
                     return document.addEventListener("keypress", checkKey);
-                } else {
-                    document.addEventListener("keypress", checkKey);
-                    return setAuth(true);
+                } else if (validPass.success === true) {
+                    setPassword(pass);
+                    console.log(password, pass)
+                    setAuth(true);
+                    console.log(auth)
                 }
+
             }
 
-            if (auth == true) return handleCommand();
+            if (auth === true) return handleCommand();
         }
     };
 
@@ -65,23 +70,19 @@ const Home: NextPage = () => {
     };
 
     async function createLink(link: string) {
-        // let password = window.prompt("Password");
-
-        // let validPass = await fetch(`/api/checkPass?pass=${password}`).then(res => res.json());
-
-        // if (validPass.success == false)
-        //     return {
-        //         first: `Incorrect password!`,
-        //         input: "",
-        //     };
 
         let data = await fetch("/api/create", {
             method: "POST",
-            body: JSON.stringify({ url: link }),
+            body: JSON.stringify({ url: link, auth: password }),
             headers: {
                 "Content-Type": "application/json",
             },
         }).then(res => res.json());
+
+        if(data.error) return {
+            first: `Invalid authentication!`,
+            input: "",
+        };
 
         navigator.clipboard.writeText(`https://l.cnrad.dev/${data.code}`);
 
@@ -92,23 +93,19 @@ const Home: NextPage = () => {
     }
 
     async function viewStats(code: string) {
-        // let password = window.prompt("Password");
-
-        // let validPass = await fetch(`/api/checkPass?pass=${password}`).then(res => res.json());
-
-        // if (validPass.success == false)
-        //     return {
-        //         first: `Incorrect password!`,
-        //         input: "",
-        //     };
 
         let data = await fetch("/api/stats", {
             method: "POST",
-            body: JSON.stringify({ code: code }),
+            body: JSON.stringify({ code: code, auth: password  }),
             headers: {
                 "Content-Type": "application/json",
             },
         }).then(res => res.json());
+
+        if(data.error) return {
+            first: `Invalid authentication!`,
+            input: "",
+        };
 
         if (data.stats === null)
             return {
