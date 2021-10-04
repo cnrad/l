@@ -6,16 +6,32 @@ import styled from "styled-components";
 
 const Home: NextPage = () => {
     const [cmdHistory, setCmdHistory]: any[] = useState([]);
+    const [auth, setAuth] = useState(false);
 
     useEffect(() => {
         document.addEventListener("keypress", checkKey);
-        (document.getElementById(`currentCommand`) as HTMLInputElement).value = "";
+        if (auth == true) (document.getElementById(`currentCommand`) as HTMLInputElement).value = "";
     }, [cmdHistory]);
 
-    const checkKey = (event: KeyboardEvent): any => {
+    const checkKey = async (event: KeyboardEvent): Promise<any> => {
         if (event.key === "Enter") {
             document.removeEventListener("keypress", checkKey);
-            handleCommand();
+
+            if (auth === false) {
+                let pass = (document.getElementById(`password`) as HTMLInputElement).value;
+
+                let validPass = await fetch(`/api/checkPass?pass=${pass}`).then(res => res.json());
+
+                if (validPass.success === false) {
+                    (document.getElementById(`password`) as HTMLInputElement).value = "";
+                    return document.addEventListener("keypress", checkKey);
+                } else {
+                    document.addEventListener("keypress", checkKey);
+                    return setAuth(true);
+                }
+            }
+
+            if (auth == true) return handleCommand();
         }
     };
 
@@ -49,15 +65,15 @@ const Home: NextPage = () => {
     };
 
     async function createLink(link: string) {
-        let password = window.prompt("Password");
+        // let password = window.prompt("Password");
 
-        let validPass = await fetch(`/api/checkPass?pass=${password}`).then(res => res.json());
+        // let validPass = await fetch(`/api/checkPass?pass=${password}`).then(res => res.json());
 
-        if (validPass.success == false)
-            return {
-                first: `Incorrect password!`,
-                input: "",
-            };
+        // if (validPass.success == false)
+        //     return {
+        //         first: `Incorrect password!`,
+        //         input: "",
+        //     };
 
         let data = await fetch("/api/create", {
             method: "POST",
@@ -76,15 +92,15 @@ const Home: NextPage = () => {
     }
 
     async function viewStats(code: string) {
-        let password = window.prompt("Password");
+        // let password = window.prompt("Password");
 
-        let validPass = await fetch(`/api/checkPass?pass=${password}`).then(res => res.json());
+        // let validPass = await fetch(`/api/checkPass?pass=${password}`).then(res => res.json());
 
-        if (validPass.success == false)
-            return {
-                first: `Incorrect password!`,
-                input: "",
-            };
+        // if (validPass.success == false)
+        //     return {
+        //         first: `Incorrect password!`,
+        //         input: "",
+        //     };
 
         let data = await fetch("/api/stats", {
             method: "POST",
@@ -147,10 +163,17 @@ const Home: NextPage = () => {
                     );
                 })}
 
-                <CommandLine>
-                    <First id="currentFirst">{"cnrad/projects/l.cnrad.dev>"}</First>
-                    <Input id="currentCommand" defaultValue="" />
-                </CommandLine>
+                {auth ? (
+                    <CommandLine>
+                        <First id="currentFirst">{"cnrad/projects/l.cnrad.dev>"}</First>
+                        <Input id="currentCommand" defaultValue="" />
+                    </CommandLine>
+                ) : (
+                    <CommandLine>
+                        <First id="currentFirst">{"password:"}</First>
+                        <Input id="password" defaultValue="" />
+                    </CommandLine>
+                )}
             </Page>
         </>
     );
