@@ -163,7 +163,7 @@ const Home: NextPage = () => {
                 ) : (
                     <CommandLine>
                         <First id="currentFirst">{"password:"}</First>
-                        <Input id="password" defaultValue="" />
+                        <Input id="password" defaultValue="" type="password" />
                     </CommandLine>
                 )}
             </Page>
