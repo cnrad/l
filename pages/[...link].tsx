@@ -6,11 +6,11 @@ export async function getServerSideProps(context: any) {
 
     let response = await redis.hget("links", shortened);
 
-    let IP = await fetch("http://l.cnrad.dev/api/getIP").then(res => res.json()).then(data => data.ip);    
+    let IP = await fetch("http://l.cnrad.dev/api/getIP")
+        .then(res => res.json())
+        .then(data => data.ip);
     let UA = context.req.headers["user-agent"];
     let DATE = new Date().toString();
-
-    console.log("data fetched")
 
     await fetch("http://l.cnrad.dev/api/log", {
         method: "POST",
@@ -18,11 +18,9 @@ export async function getServerSideProps(context: any) {
             ip: IP,
             userAgent: UA,
             date: DATE,
-            code: shortened
-        })
-    })
-
-    console.log("posted data")
+            code: shortened,
+        }),
+    });
 
     if (!response || response == null) {
         return {
@@ -42,8 +40,6 @@ export async function getServerSideProps(context: any) {
 }
 
 export default function Home({ error, message }: any) {
-
-
     return (
         <Main>
             <Message>Redirecting shortly...</Message>
@@ -64,7 +60,7 @@ const Main = styled.div`
 
 const Message = styled.div`
     font-size: 20px;
-    font-family: 'Ubuntu Mono', sans-serif;
+    font-family: "Ubuntu Mono", sans-serif;
     font-weight: 600;
     color: #3f3;
 `;

@@ -11,8 +11,11 @@ const Home: NextPage = () => {
     useEffect(() => {
         document.addEventListener("keypress", checkKey);
         if (auth == true) (document.getElementById(`currentCommand`) as HTMLInputElement).value = "";
-        
     }, [cmdHistory, auth]);
+
+    useEffect(() => {
+        (document.getElementById(`password`) as HTMLInputElement).focus();
+    }, []);
 
     const checkKey = async (event: KeyboardEvent): Promise<any> => {
         if (event.key === "Enter") {
@@ -29,8 +32,8 @@ const Home: NextPage = () => {
                 } else if (validPass.success === true) {
                     setPassword(pass);
                     setAuth(true);
+                    (document.getElementById(`currentCommand`) as HTMLInputElement).focus();
                 }
-
             }
 
             if (auth === true) return handleCommand();
@@ -53,6 +56,8 @@ const Home: NextPage = () => {
                 input: result.input,
             },
         ]);
+
+        return document.getElementById("currentCommand")!.scrollIntoView();
     };
 
     const executeCommand = async (cmd: string) => {
@@ -60,12 +65,12 @@ const Home: NextPage = () => {
 
         if (cmdArgs[0] === "create") return createLink(cmdArgs[1]);
         if (cmdArgs[0] === "stats") return viewStats(cmdArgs[1]);
+        if (cmdArgs[0] === "ls") return listLinks();
 
         return invalidCommand(cmdArgs[0]);
     };
 
     async function createLink(link: string) {
-
         let data = await fetch("/api/create", {
             method: "POST",
             body: JSON.stringify({ url: link, auth: password }),
@@ -74,10 +79,11 @@ const Home: NextPage = () => {
             },
         }).then(res => res.json());
 
-        if(data.error) return {
-            first: `Invalid authentication!`,
-            input: "",
-        };
+        if (data.error)
+            return {
+                first: `Invalid authentication!`,
+                input: "",
+            };
 
         navigator.clipboard.writeText(`https://l.cnrad.dev/${data.code}`);
 
@@ -88,19 +94,19 @@ const Home: NextPage = () => {
     }
 
     async function viewStats(code: string) {
-
         let data = await fetch("/api/stats", {
             method: "POST",
-            body: JSON.stringify({ code: code, auth: password  }),
+            body: JSON.stringify({ code: code, auth: password }),
             headers: {
                 "Content-Type": "application/json",
             },
         }).then(res => res.json());
 
-        if(data.error) return {
-            first: `Invalid authentication!`,
-            input: "",
-        };
+        if (data.error)
+            return {
+                first: `Invalid authentication!`,
+                input: "",
+            };
 
         if (data.stats === null)
             return {
@@ -110,6 +116,33 @@ const Home: NextPage = () => {
 
         return {
             first: JSON.stringify(data),
+            input: "",
+        };
+    }
+
+    async function listLinks() {
+        let data = await fetch("/api/list", {
+            method: "POST",
+            body: JSON.stringify({ auth: password }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(res => res.json());
+
+        if (data.error)
+            return {
+                first: `Invalid authentication!`,
+                input: "",
+            };
+
+        if (data.links === null)
+            return {
+                first: "No links created!",
+                input: "",
+            };
+
+        return {
+            first: data.links,
             input: "",
         };
     }
@@ -128,7 +161,30 @@ const Home: NextPage = () => {
             </Head>
             <Page>
                 {cmdHistory.map((element: any, index: number) => {
-                    if (cmdHistory[index].first.includes("userAgent")) {
+                    if (
+                        (index > 0 && cmdHistory[index - 1].input.startsWith("ls ")) ||
+                        (index > 0 && cmdHistory[index - 1].input === "ls")
+                    ) {
+                        let obj = JSON.parse(cmdHistory[index].first);
+
+                        return (
+                            <DataCont>
+                                {Object.keys(obj).map((key: string) => {
+                                    return (
+                                        <>
+                                            <DataLine>{`${key} || ${obj[key]}`}</DataLine>
+                                        </>
+                                    );
+                                })}
+                            </DataCont>
+                        );
+                    }
+
+                    if (
+                        index > 0 &&
+                        cmdHistory[index].first.includes("userAgent") &&
+                        cmdHistory[index - 1].input.includes("stats")
+                    ) {
                         let obj = JSON.parse(cmdHistory[index].first);
 
                         return (
