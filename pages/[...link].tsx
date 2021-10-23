@@ -6,13 +6,13 @@ export async function getServerSideProps(context: any) {
 
     let response = await redis.hget("links", shortened);
 
-    let IP = await fetch("http://l.cnrad.dev/api/getIP")
+    let IP = await fetch("https://l.cnrad.dev/api/getIP")
         .then(res => res.json())
         .then(data => data.ip);
     let UA = context.req.headers["user-agent"];
     let DATE = new Date().toString();
 
-    await fetch("http://l.cnrad.dev/api/log", {
+    await fetch("https://l.cnrad.dev/api/log", {
         method: "POST",
         body: JSON.stringify({
             ip: IP,
