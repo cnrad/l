@@ -66,6 +66,7 @@ const Home: NextPage = () => {
         if (cmdArgs[0] === "create") return createLink(cmdArgs[1]);
         if (cmdArgs[0] === "stats") return viewStats(cmdArgs[1]);
         if (cmdArgs[0] === "ls") return listLinks();
+        if (cmdArgs[0] === "delete" || cmdArgs[0] === "del") return deleteLink(cmdArgs[1]);
 
         return invalidCommand(cmdArgs[0]);
     };
@@ -143,6 +144,33 @@ const Home: NextPage = () => {
 
         return {
             first: data.links,
+            input: "",
+        };
+    }
+
+    async function deleteLink(code: string) {
+        let data = await fetch("/api/delete", {
+            method: "POST",
+            body: JSON.stringify({ code: code, auth: password }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(res => res.json());
+
+        if (data.error)
+            return {
+                first: `Invalid authentication!`,
+                input: "",
+            };
+
+        if (data.success !== true)
+            return {
+                first: "Link or code does not exist!",
+                input: "",
+            };
+
+        return {
+            first: `Link ${code} deleted successfully.`,
             input: "",
         };
     }
