@@ -9,7 +9,7 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
 
-    let ipAddr = req.headers["x-vercel-forwarded-for"] as string;
+    let ipAddr = req.headers["x-forwarded-for"] as string;
 
     return res.status(200).json({ ip: ipAddr });
 }
