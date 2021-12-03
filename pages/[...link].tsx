@@ -11,9 +11,11 @@ export async function getServerSideProps(context: any) {
     //     .then(res => res.json())
     //     .then(data => data.ip);
 
-    let IP = await fetch("http://api.ipify.org/?format=json")
-        .then(res => res.json())
-        .then(data => data.ip);
+    let IP = context.req.headers["x-forwarded-for"] ?? context.req.socket.remoteAddress ?? "undefined";
+
+    // let IP = await fetch("http://api.ipify.org/?format=json")
+    //     .then(res => res.json())
+    //     .then(data => data.ip);
 
     let UA = context.req.headers["user-agent"];
     let DATE = new Date().toString();
